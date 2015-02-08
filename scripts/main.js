@@ -3,9 +3,9 @@ $(document).ready(function (){
 });
 function __prepare() {
   window.location.href='./?unique='+unique()+'# Do Not Share This URL!';
-  
+
   decks = {};
-  
+
   placeTables();
   $(window).resize(function(){
     placeTables();
@@ -19,17 +19,17 @@ function __prepare() {
   $('.refresher_b').tooltip();
   setInterval(function(){
     balRefresh();
-  },400);
+},2000);
   placeStatic();
   decks = {};
-  
+
   $('.leftMenu a').each(function(){
     $(this).tooltip();
   });
   $('.captchadiv').tooltip();
-  
+
   scrolledBottom = true;
-  
+
   $('.chat-messages').mCustomScrollbar({
     theme: 'dark',
     scrollInertia: 0,
@@ -53,7 +53,7 @@ function __prepare() {
   });
   //$('.chat-messages').mCustomScrollbar('scrollTo','bottom');
 
-  
+
   $('.chat-input-elem').keypress(function(e){
     if (e.which == 13) chatSend();
   });
@@ -61,11 +61,11 @@ function __prepare() {
 
   chatReceiveUpdates = false;
   chatUpdating = false;
-  
+
   setInterval(function(){
     if (chatReceiveUpdates) chatUpdate();
   },500);
-  
+
   $('.modal').each(function(){
     $(this).on('hide.bs.modal',function(){
       $('.modalReaction').each(function(){
@@ -81,7 +81,7 @@ function __prepare() {
     imitateCRON();
   },1000);
 
-  buttons = {    
+  buttons = {
     disableAll: function() {
       $('.gameControllers').attr('disabled',true);
       $('.gameControllers').addClass('btn-disabled');
@@ -95,7 +95,7 @@ function __prepare() {
     stand: new _button($('.gameControllers.gC-2')),
     double: new _button($('.gameControllers.gC-3')),
     split: new _button($('.gameControllers.gC-4'))
-  }    
+  }
 
 }
 
@@ -116,7 +116,7 @@ function placeTables() {
   $('.cj-rivalTables').css('margin-left',margin($('.cj-rivalTables').width(),$('.gamblingTable').width()-$('.leftBox').width())+$('.leftBox').width());
   // cj-control
   $('.cj-leftMargin').width($('.leftBox').width());
-  
+
   $.each(decks,function(objName,obj){
     if (objName!='splitted') obj.sumPosition();
   });
@@ -172,7 +172,7 @@ function balRefresh() {
     'success': function (data) {
       $('.balances').each(function(){
         $(this).html(data['balance']);
-      });    
+      });
     }
   });
 }
@@ -196,35 +196,35 @@ function chatUpdate() {
   var lastID = 0;
   if ($('.chat-message').length)
     lastID = $('.chat-message').last().attr('data-messid');
-  
+
   if (chatUpdating) return;
 
-  chatUpdating=true;  
+  chatUpdating=true;
 
   $.ajax({
     'url': './content/ajax/chatUpdate.php?_unique='+unique()+'&lastId='+lastID,
     'dataType': "json",
     'success': function(data) {
       var _scrolledBottom = scrolledBottom;
-      
+
       var $messages = $(data['content']);
-      
+
       var $existingMessages = $('.chat-messages .mCSB_container');
 
       $messages.each(function(){
         var $message = $(this).remove();
         var messid = $message.attr('data-messid');
-        
-        
+
+
         if ($existingMessages.children('[data-messid="'+messid+'"]').length) {
           // $message.remove()
         }
       });
-      
+
       $existingMessages.append($messages);
       if (_scrolledBottom)
         $('.chat-messages').mCustomScrollbar('scrollTo','last',{scrollInertia:100});
-      
+
       chatUpdating=false;
     }
   });
@@ -239,7 +239,7 @@ function stats() {
     'success': function(data) {
       $('.statsCon').html(data['content']);
     }
-  });  
+  });
 }
 function news() {
   $('#modals-news').modal('show');
@@ -254,7 +254,7 @@ function saveAlias() {
     'dataType': "json",
     'success': function(data) {
       $('#aliasSave-reaction').css('color',data['color']).html(data['content']);
-      if (data['repaired']!=null) $('#input-alias').val(data['repaired']);      
+      if (data['repaired']!=null) $('#input-alias').val(data['repaired']);
     }
   });
 }
@@ -316,7 +316,7 @@ function saveClientSeed() {
     'success': function (data) {
       $('#clientSeedSave-reaction').css('color',data['color']).html(data['content']);
       if (data['repaired']!=null) $('#input-client_seed').val(data['repaired']);
-    }    
+    }
   });
 }
 
@@ -338,7 +338,7 @@ function _withdraw() {
         $('.m_alert').hide();
         $('.m_alert').html('<div class="alert alert-dismissable alert-success"><button type="button" class="close" data-dismiss="alert">×</button><b>Processed.</b><br>TXID: <small>'+data['content']+'</small></div>');
         $('.m_alert').slideDown();
-        balRefresh();        
+        balRefresh();
       }
     }
   });
@@ -357,12 +357,12 @@ function _genNewAddress() {
 }
 function deposit() {
   $('#modals-deposit').modal('show');
-  _genNewAddress();  
+  _genNewAddress();
 }
 function clickPending() {
   if ($('.pendingbutton').attr('cj-opened')=='yes') hidePending();
   else showPending();
-}                    
+}
 function showPending() {
   $.ajax({
     'url': './content/ajax/getPending.php?_unique='+unique(),
@@ -451,7 +451,7 @@ function closeChat() {
 
 function gameAction(action) {
   buttons.disableAll();
-  
+
   $.ajax({
     'url': './content/ajax/gameAction.php?_unique='+unique()+'&action='+action,
     'dataType': "json",
@@ -474,19 +474,19 @@ function gameAction(action) {
 function gameUpdate(data) {
   if (typeof data['splitted_cards']!='undefined') {
     decks.player.addCard(
-      data['splitted_cards']['card-1'][0], 
-      data['splitted_cards']['card-1'][1], 
-      data['splitted_cards']['card-1'][2] 
+      data['splitted_cards']['card-1'][0],
+      data['splitted_cards']['card-1'][1],
+      data['splitted_cards']['card-1'][2]
     );
     decks.player_2.addCard(
-      data['splitted_cards']['card-2'][0], 
-      data['splitted_cards']['card-2'][1], 
-      data['splitted_cards']['card-2'][2] 
+      data['splitted_cards']['card-2'][0],
+      data['splitted_cards']['card-2'][1],
+      data['splitted_cards']['card-2'][2]
     ,function(){
       buttonsAccess(data['accessable']);
       decks.player.setSum(data['splitted_cards']['deck-1-value']);
       decks.player_2.setSum(data['splitted_cards']['deck-2-value']);
-      
+
       if (data['winner']!='-' && data['winner']!='tie') ceremonial(true,'<b>WON</b>');
       else if (data['winner']=='tie') ceremonial(true,'<b>TIE</b>');
     });
@@ -506,13 +506,13 @@ function gameUpdate(data) {
       if (data['winner']=='dealer') ceremonial(false,'<b>LOSE</b>');
 
       if (typeof data['re-stand']!='undefined' && data['winner']=='-') gameAction('stand');
-      
-      
+
+
     });
   }
   if (typeof data['nextDeck']!='undefined' && data['nextDeck']=='yes') {
     decks.player.removeMark();
-    
+
     if (typeof decks.player_2!='undefined')  decks.player_2.setMark();
   }
   if (typeof data['hitted_card-player_deck_2']!='undefined') {
@@ -528,11 +528,11 @@ function gameUpdate(data) {
       if (data['winner']=='player') ceremonial(true,'<b>WON</b>');
       if (data['winner']=='tie') ceremonial(true,'<b>TIE</b>');
       if (data['winner']=='dealer') ceremonial(false,'<b>LOSE</b>');
-      
+
       if (typeof data['re-stand']!='undefined' && data['winner']=='-') gameAction('stand');
 
-      
-      
+
+
     });
   }
   if (typeof data['standed']!='undefined') {
@@ -542,79 +542,79 @@ function gameUpdate(data) {
       if (data['winner']=='player') ceremonial(true,'<b>WON</b>');
       if (data['winner']=='tie') ceremonial(true,'<b>TIE</b>');
       if (data['winner']=='dealer') ceremonial(false,'<b>LOSE</b>');
-  
-  } 
+
+  }
 }
 
 function deck(_deckObj) {
-  
+
   this.$deckObj = _deckObj;
   this.$sumObj = $('<div class="deckSum"></div>')
                         .appendTo('body');
-  
+
   this.$markObj = $('<div class="deck_mark"><span class="glyphicon glyphicon-chevron-down"></span></div>')
                         .appendTo('body');
-  
+
   this.addCard = function (suit,val,colour,done) {
 
     var $deck=this.$deckObj;
-  
+
     // init card
     var $emptyOuter=$('<div class="cardOuter"></div>').appendTo($deck);
-    var $newCard=$('<div class="card"><div class="value">'+val+'</div><div class="suit">'+suit+'</div></div>');  
-    
+    var $newCard=$('<div class="card"><div class="value">'+val+'</div><div class="suit">'+suit+'</div></div>');
+
     if (suit=='-') $newCard.prepend('<div class="back"></div>');
-    
+
     if (colour=='red') $newCard.addClass('red');
-    
+
     var $temp=$emptyOuter.clone().appendTo('body');
     $temp.addClass('clone');
-    $temp.css('left',$emptyOuter.offset().left);  
+    $temp.css('left',$emptyOuter.offset().left);
     $temp.append($newCard);
-    
+
     $emptyOuter.append($newCard.clone().css('visibility','hidden'));
-    
+
     $temp.animate({'top':$emptyOuter.offset().top},600,'linear',function(){
       $emptyOuter.children().css('visibility','visible');
       $temp.remove();
-      if (done!=null) done();  
-    });    
-  
+      if (done!=null) done();
+    });
+
   }
   this.revealCards = function (cards) {
     var $deck=this.$deckObj;
-    
+
     $deck.empty();
-    
+
     for (var i=0;i<cards.length;i++) {
       var $emptyOuter=$('<div class="cardOuter"></div>').appendTo($deck);
-      var $newCard=$('<div class="card"><div class="value">'+cards[i][1]+'</div><div class="suit">'+cards[i][0]+'</div></div>');  
+      var $newCard=$('<div class="card"><div class="value">'+cards[i][1]+'</div><div class="suit">'+cards[i][0]+'</div></div>');
 
       if (cards[i][2]=='red') $newCard.addClass('red');
 
       $emptyOuter.append($newCard);
-    
+
     }
-    
+
     original_width=$deck.width();
-    
+
   }
-  
+
   this.setSum = function (newsum) {
     var $sum=this.$sumObj;
-    
+
     $sum.html(newsum);
     $sum.css('display','block');
   }
 
   this.sumPosition = function () {
     var $sum=this.$sumObj;
-    
+
     var left=((this.$deckObj.offset().left) - ($sum.width() + 2*parseInt($sum.css('padding'))) - 30);
-    
+
     if (this.$deckObj.hasClass('deck-second'))
       left=((this.$deckObj.offset().left) + (this.$deckObj.width()) + 30);
-    
+
     $sum
         .css('top', (this.$deckObj.offset().top) + margin($sum.height(),this.$deckObj.height()))
         .css('left', left );
@@ -622,26 +622,26 @@ function deck(_deckObj) {
   }
   this.setMark = function () {
     var $mark=this.$markObj;
-    
+
     deck_offset = this.$deckObj.offset();
     deck_width = this.$deckObj.width();
     deck_height = this.$deckObj.height();
-    
+
     var top = (deck_offset.top - 30);
     var left = (deck_offset.left + margin($mark.width(),deck_width));
-    
+
     $mark.css({
       display: 'block',
       left: left,
       top: top
-    });    
+    });
   }
   this.removeMark = function () {
     var $mark=this.$markObj;
-    
+
     $mark.css({
       display: 'none'
-    });        
+    });
   }
 }
 
@@ -688,21 +688,21 @@ function bet() {
                 if (data['winner']=='player') ceremonial(true,'<b>WON</b>');
                 if (data['winner']=='tie') ceremonial(true,'<b>TIE</b>');
                 if (data['winner']=='dealer') ceremonial(false,'<b>LOSE</b>');
-              });                  
-            });          
-          });        
+              });
+            });
+          });
         });
-        
+
       }
-    }    
+    }
   });
 }
 
 function ceremonial(won,content) {
   $cermess=$('<div class="ceremonial"></div>').appendTo('.cj-rivalTables');
-  
+
   $cermess.html(content);
-  
+
   $cermess.css({
     'display': 'block',
     'top': margin($cermess.height(),$('.cj-rivalTables').height()),
@@ -733,12 +733,12 @@ function initGame() {
   $('.deckSum').remove();
   $('.ceremonial').remove();
   $('.deck_mark').remove();
-  
+
   decks = {
     dealer: new deck($('<div class="deck"></div>').appendTo('.cj-dealerTable')),
     player: new deck($('<div class="deck"></div>').appendTo('.cj-playerTable'))
   }
-  
+
 }
 
 function playingOnInit() {
@@ -748,7 +748,7 @@ function playingOnInit() {
     'dataType': "json",
     'success': function (data) {
       initGame();
-      
+
       for (var i=0;i<data['dealer']['cards'].length;i++) {
 
         decks.dealer.addCard(
@@ -761,8 +761,8 @@ function playingOnInit() {
           decks.player.setSum(data['sums']['player']);
           if (data['sums']['player2']!='-') decks.player_2.setSum(data['sums']['player2']);
         });
-        
-               
+
+
       }
       for (var i=0;i<data['player']['cards'].length;i++) {
 
@@ -771,23 +771,23 @@ function playingOnInit() {
           data['player']['cards'][i][1],
           data['player']['cards'][i][2]
         );
-        
+
         if (data['player']['cards2'] && i==1) splitPlayerDecks(function(){});
-        
-               
+
+
       }
       if (data['player']['cards2']) {
         for (var i=0;i<data['player']['cards2'].length;i++) {
-    
+
           decks.player_2.addCard(
             data['player']['cards2'][i][0],
             data['player']['cards2'][i][1],
             data['player']['cards2'][i][2]
-          );               
+          );
         }
 
       }
-    }    
+    }
   });
 
 }
@@ -835,21 +835,21 @@ function splitPlayerDecks(done_fc) {
     .css('left',secCard_offset_1.left)
     .css('top',secCard_offset_1.top)
     .addClass('clone');
-      
+
   $firstDeck
     .children().eq(-1)
     .remove()
     .clone()
     .appendTo($secDeck);
-    
-  
+
+
   $firstDeck
     .wrap($('<table></table>').addClass('splitted'))
     .wrap('<tr></tr>')
     .parent().append($secDeck).children()
     .children().children().css('visibility','hidden').parent().parent()
     .wrap('<td></td>');
-    
+
   decks.splitted = true;
 
   var firstCard_offset_2 = $secDeck
