@@ -1,12 +1,12 @@
 <?php
 /*
  *  © CryptoBlackJack
- *  
- *  
- *  
+ *
+ *
+ *
 */
 
-if (!isset($init)) exit();     
+if (!isset($init)) exit();
 
 function prot_mail($mail2,$max_delka=0) {
   $mail=mysql_real_escape_string(trim(chop(strip_tags($mail2))));
@@ -30,7 +30,7 @@ function prot($hodnota,$max_delka=0) {
 }
 
 function generateHash($length,$capt=false) {
-  if ($capt==true) $possibilities='123456789ABCDEFGHIJKLMNPQRSTUVWXYZ'; 
+  if ($capt==true) $possibilities='123456789ABCDEFGHIJKLMNPQRSTUVWXYZ';
   else $possibilities='abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   $return='';
   for ($i=0;$i<$length;$i++)  $return.=$possibilities[mt_rand(0,strlen($possibilities)-1)];
@@ -52,18 +52,18 @@ function card_value($card_val) {
 
 function dealerPlays($dealer_deck,$final_shuffle,$used_cards) {
   $settings=mysql_fetch_array(mysql_query("SELECT * FROM `system` WHERE `id`=1 LIMIT 1"));
-  
+
   $threshold=17; // under = HIT
-  
+
   while (max(getSums($dealer_deck))<$threshold) {
     $dealer_deck[]=$final_shuffle[$used_cards];
     $used_cards++;
   }
   if ($settings['hits_on_soft']==1 && max(getSums($dealer_deck))==$threshold && count(getSums($dealer_deck))==2) {
     $dealer_deck[]=$final_shuffle[$used_cards];
-    $used_cards++;    
+    $used_cards++;
   }
-  
+
   return $dealer_deck;
 }
 
@@ -73,13 +73,13 @@ function getSums($deck) {
   foreach ($deck as $cardStr) {
     $card=explode('_',$cardStr);
     $val=card_value($card[1]);
-    
+
     $sum+=$val;
     $card_vals[]=$val;
   }
   $sums=array($sum);
   if (in_array(1,$card_vals) && ($sum+10)<=21) $sums[]=($sum+10);
-  
+
   return $sums;
 }
 
@@ -110,7 +110,7 @@ function playerWon($player_id,$game_id,$wager,$regular_or_tie,$blackjack,$final_
   mysql_query("UPDATE `players` SET "
 
               ."`balance`=ROUND((`balance`+".($wager*$multip)."),9)"
-              .$endGame              
+              .$endGame
               ." WHERE `id`=$player_id LIMIT 1");
 
   $t_wins=0;
@@ -123,7 +123,7 @@ function playerWon($player_id,$game_id,$wager,$regular_or_tie,$blackjack,$final_
     $t_bets-=1;
     $t_wagered=$wager*-1;
   }
-  else 
+  else
   mysql_query("UPDATE `system` SET `t_wagered`=`t_wagered`+$t_wagered,`t_bets`=`t_bets`+$t_bets,`t_wins`=`t_wins`+$t_wins,`t_player_profit`=ROUND((`t_player_profit`+".($wager*$multip)."),8) WHERE `id`=1 LIMIT 1");
 
 }
@@ -141,16 +141,16 @@ function generateInitialShuffle() {
   shuffle($initial_shuffle);
   $initial_shuffle=cs_shuffle(mt_rand(),$initial_shuffle);
   return serialize(array('initial_array'=>$initial_shuffle,'random_string'=>generateHash(32)));
-}                                                                
+}
 
-function newPlayer($wallet) {
+function newPlayer() {
   do $hash=generateHash(32);
   while (mysql_num_rows(mysql_query("SELECT `id` FROM `players` WHERE `hash`='$hash' LIMIT 1"))!=0);
   $alias='Player_';
   $alias_i=mysql_fetch_array(mysql_query("SELECT `autoalias_increment` AS `data` FROM `system` LIMIT 1"));
   $alias_i=$alias_i['data'];
   mysql_query("UPDATE `system` SET `autoalias_increment`=`autoalias_increment`+1 LIMIT 1");
-  mysql_query("INSERT INTO `players` (`hash`,`alias`,`time_last_active`,`initial_shuffle`,`client_seed`) VALUES ('$hash','".$alias.$alias_i."',NOW(),'".generateInitialShuffle()."','".random_num(12)."')");
+  mysql_query("INSERT INTO `players` (`hash`,`alias`,`time_last_active`,`initial_shuffle`,`client_seed`) VALUES ('$hash','".$alias.$alias_i."',NOW(),'".generateInitialShuffle()."','".random_num(12)."')") OR die(mysql_error());
   header('Location: ./?unique='.$hash.'# Do Not Share This URL!');
   exit();
 }
@@ -182,9 +182,9 @@ function listDeck() {
     '♠_Q_black',  '♥_Q_black',  '♦_Q_black',  '♣_Q_black',
     '♠_K_black',  '♥_K_black',  '♦_K_black',  '♣_K_black',
   );
-  
+
   $return=array();
-  
+
   foreach ($blacks as $black) {
     $return[]=$black;
     $return[]=str_replace('_black','_red',$black);
@@ -193,23 +193,23 @@ function listDeck() {
 }
 
 function cs_shuffle($client_seed,$deck) {
-  
+
   $final_deck=$deck; // copy deck to final_deck
-  
+
   srand((int)$client_seed);
-    
+
   foreach ($final_deck as $key => $final_card) {
     do {
       $deck_index = rand(0,count($deck)-1);
     } while ($deck[$deck_index]===null);
-    
+
     $final_deck[$key]=$deck[$deck_index];
-    
+
     $deck[$deck_index]=null;
   }
-  
+
   srand(mt_rand());
-  
+
   return $final_deck;
 }
 

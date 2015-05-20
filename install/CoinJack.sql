@@ -68,6 +68,7 @@ CREATE TABLE `games` (
   `final_shuffle` text COLLATE utf8_unicode_ci NOT NULL,
   `used_cards` int(255) NOT NULL,
   `accessable_actions` int(1) NOT NULL,
+  `canhit` int(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -164,4 +165,3 @@ CREATE TABLE `transactions` (
   PRIMARY KEY (`id`),
   KEY `player_id` (`player_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
